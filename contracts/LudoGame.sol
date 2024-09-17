@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.0;
 
 contract LudoGame {
     uint8 constant MAX_PLAYERS = 4;
@@ -58,7 +58,7 @@ contract LudoGame {
         
         uint256 randomNumber = uint256(keccak256(abi.encodePacked(
             block.timestamp,
-            block.difficulty,
+            block.prevrandao,
             msg.sender,
             nonce
         )));
@@ -101,7 +101,6 @@ contract LudoGame {
         currentPlayer.tokenPositions[tokenIndex] = currentPosition;
         
         emit TokenMoved(msg.sender, tokenIndex, currentPosition);
-        
         if (currentPosition == currentPlayer.tokenStart) {
             currentPlayer.tokensHome++;
             if (currentPlayer.tokensHome == TOKENS_PER_PLAYER) {
@@ -116,18 +115,19 @@ contract LudoGame {
 
     function getGameState() external view returns (
         address[] memory playerAddresses,
-        uint8[][] memory tokenPositions,
+        uint8[MAX_PLAYERS][TOKENS_PER_PLAYER] memory tokenPositions,
         uint8[] memory tokensHome,
         uint8 currentPlayer,
         bool isGameInProgress
     ) {
         playerAddresses = new address[](playerCount);
-        tokenPositions = new uint8[][](playerCount);
         tokensHome = new uint8[](playerCount);
 
         for (uint8 i = 0; i < playerCount; i++) {
             playerAddresses[i] = players[i].addr;
-            tokenPositions[i] = players[i].tokenPositions;
+            for (uint8 j = 0; j < TOKENS_PER_PLAYER; j++) {
+                tokenPositions[i][j] = players[i].tokenPositions[j];
+            }
             tokensHome[i] = players[i].tokensHome;
         }
 
