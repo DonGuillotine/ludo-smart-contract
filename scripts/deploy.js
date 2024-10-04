@@ -6,7 +6,7 @@ async function main() {
   console.log("Deploying contract with the account:", deployer.address);
 
   const LudoGame = await hre.ethers.getContractFactory("LudoGame");
-  const ludoGame = await LudoGame.deploy(deployer.address);
+  const ludoGame = await LudoGame.deploy();
   await ludoGame.waitForDeployment();
 
   console.log("LudoGame deployed to:", await ludoGame.getAddress());
